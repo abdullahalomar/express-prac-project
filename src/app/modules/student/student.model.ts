@@ -1,15 +1,13 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { Schema, model } from 'mongoose';
 // import validator from 'validator';
 import {
   TGuardian,
   TLocalGuardian,
   TStudent,
-  StudentMethod,
   StudentModel,
   TUserName,
-} from './student/student.interface';
-import bcrypt from 'bcrypt';
-import config from '../config';
+} from './student.interface';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -75,10 +73,11 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 const studentSchema = new Schema<TStudent, StudentModel>(
   {
     id: { type: String, required: [true, 'id is required'], unique: true },
-    password: {
-      type: String,
-      required: [true, 'password is required'],
-      maxlength: [20, 'password ca not be more than 20 character'],
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User id must be required'],
+      unique: true,
+      ref: 'User',
     },
     name: {
       type: userNameSchema,
@@ -115,11 +114,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: true,
     },
     profileImg: { type: String, required: true },
-    isActive: {
-      type: String,
-      enum: ['active', 'inActive'],
-      default: 'active',
-    },
+
     isDeleted: {
       type: Boolean,
       default: false,
@@ -138,30 +133,6 @@ studentSchema.statics.isUserExist = async function (id: string) {
   return existingUser;
 };
 
-// creating a custom instance method
-// studentSchema.methods.isUserExist = async function (id: string) {
-//   const existingUser = await Student.findOne({ id });
-//   return existingUser;
-// };
-
-// pre save middleware / hook:will work on create() or save() method
-studentSchema.pre('save', async function (next) {
-  // console.log(this, 'pre hook: we will save data');
-  const user = this;
-  // hashing password and data save into db
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_round),
-  );
-  next();
-});
-
-// post save middleware / hook
-studentSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
-});
-
 // query middleware
 studentSchema.pre('find', function (next) {
   this.find({ isDeleted: { $ne: true } });
@@ -173,7 +144,6 @@ studentSchema.pre('findOne', function (next) {
   next();
 });
 
-//[{ '$match': {isDeleted : { $ne: true }} }, { '$match': { id: '72549' } } ]
 studentSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
 
