@@ -29,14 +29,6 @@ const updateAcademicSemesterDB = async (
   id: string,
   payload: Partial<TAcademicSemester>,
 ) => {
-  // if (
-  //   payload.name &&
-  //   payload.code &&
-  //   AcademicSemesterNameCodeMapper[payload.code] !== payload.code
-  // ) {
-  //   throw new Error('Invalid semester code');
-  // }
-
   if (
     payload.name &&
     payload.code &&
