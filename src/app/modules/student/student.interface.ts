@@ -32,6 +32,7 @@ export type TStudent = {
   gender: 'Male' | 'Female';
   dateOfBirth?: Date;
   email: string;
+  contactNo: string;
   emergencyContactNo: string;
   blood?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   presentAddress: string;

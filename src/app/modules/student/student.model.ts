@@ -98,6 +98,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: true,
       unique: true,
     },
+    contactNo: { type: String, required: true },
     emergencyContactNo: { type: String, required: true },
     blood: {
       type: String,
