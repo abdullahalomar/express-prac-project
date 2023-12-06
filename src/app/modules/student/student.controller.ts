@@ -5,7 +5,7 @@ import catchAsync from '../../utilities/catchAsync';
 // import studentValidationSchema from './student.validation';
 
 const getAllStudent = catchAsync(async (req, res) => {
-  const result = await studentServices.getStudentDb();
+  const result = await studentServices.getStudentDb(req.query);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
