@@ -1,12 +1,11 @@
 import { Schema, model } from 'mongoose';
-import { FacultyModel, TFaculty, TUserName } from './faculty.interface';
-import { User } from '../user/user.model';
-import { BloodGroup, Gender } from './faculty.constant';
+import { BloodGroup, Gender } from './admin.constant';
+import { AdminModel, TAdmin, TUserName } from './admin.interface';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
-    required: [true, 'First name is required'],
+    required: [true, 'First Name is required'],
     trim: true,
     maxlength: [20, 'Name can not be more than 20 characters'],
   },
@@ -16,13 +15,13 @@ const userNameSchema = new Schema<TUserName>({
   },
   lastName: {
     type: String,
-    required: [true, 'Last name is required'],
     trim: true,
+    required: [true, 'Last Name is required'],
     maxlength: [20, 'Name can not be more than 20 characters'],
   },
 });
 
-const facultySchema = new Schema<TFaculty, FacultyModel>(
+const adminSchema = new Schema<TAdmin, AdminModel>(
   {
     id: {
       type: String,
@@ -31,9 +30,9 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
     },
     user: {
       type: Schema.Types.ObjectId,
-      required: [true, 'user is required'],
+      required: [true, 'User id is required'],
       unique: true,
-      ref: User,
+      ref: 'User',
     },
     designation: {
       type: String,
@@ -77,17 +76,7 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
       type: String,
       required: [true, 'Permanent address is required'],
     },
-    profileImage: { type: String },
-    academicDepartment: {
-      type: Schema.Types.ObjectId,
-      required: [true, 'User id is required'],
-      ref: 'User',
-    },
-    academicFaculty: {
-      type: Schema.Types.ObjectId,
-      required: [true, 'User id is required'],
-      ref: 'User',
-    },
+    profileImg: { type: String },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -100,8 +89,8 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
   },
 );
 
-// generate full name
-facultySchema.virtual('fullName').get(function () {
+// generating full name
+adminSchema.virtual('fullName').get(function () {
   return (
     this?.name?.firstName +
     '' +
@@ -111,20 +100,26 @@ facultySchema.virtual('fullName').get(function () {
   );
 });
 
-// filter deleted document
-facultySchema.pre('find', function (next) {
+// filter out deleted documents
+adminSchema.pre('find', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
-facultySchema.pre('findOne', function (next) {
+adminSchema.pre('findOne', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
-facultySchema.pre('aggregate', function (next) {
+adminSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
   next();
 });
 
-export const Faculty = model<TFaculty, FacultyModel>('Faculty', facultySchema);
+//checking if user is already exist!
+adminSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await Admin.findOne({ id });
+  return existingUser;
+};
+
+export const Admin = model<TAdmin, AdminModel>('Admin', adminSchema);
