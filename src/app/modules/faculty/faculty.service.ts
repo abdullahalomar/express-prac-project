@@ -16,7 +16,7 @@ const getAllStudentDB = async (query: Record<string, unknown>) => {
     .search(FacultySearchableFields)
     .filter()
     .sort()
-    // .paginate()
+    .paginate()
     .fields();
 
   const result = await facultyQuery.modelQuery;

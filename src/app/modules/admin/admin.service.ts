@@ -13,7 +13,7 @@ const getAllAdminsDB = async (query: Record<string, unknown>) => {
     .search(AdminSearchableFields)
     .filter()
     .sort()
-    // .paginate()
+    .paginate()
     .fields();
 
   const result = await adminQuery.modelQuery;
@@ -44,46 +44,6 @@ const updateAdminDB = async (id: string, payload: Partial<TAdmin>) => {
   });
   return result;
 };
-
-// const deleteAdminDB = async (id: string) => {
-//   const session = await mongoose.startSession();
-
-//   try {
-//     session.startTransaction();
-
-//     const deletedAdmin = await Admin.findByIdAndUpdate(
-//       id,
-//       { isDeleted: true },
-//       { new: true, session },
-//     );
-
-//     if (!deletedAdmin) {
-//       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete student');
-//     }
-
-//     // get user _id from deletedAdmin
-//     const userId = deletedAdmin.user;
-
-//     const deletedUser = await User.findOneAndUpdate(
-//       userId,
-//       { isDeleted: true },
-//       { new: true, session },
-//     );
-
-//     if (!deletedUser) {
-//       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
-//     }
-
-//     await session.commitTransaction();
-//     await session.endSession();
-
-//     return deletedAdmin;
-//   } catch (err: any) {
-//     await session.abortTransaction();
-//     await session.endSession();
-//     throw new Error(err);
-//   }
-// };
 
 const deleteAdminDB = async (id: string) => {
   const session = await mongoose.startSession();
